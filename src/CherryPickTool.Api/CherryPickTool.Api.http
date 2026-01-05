@@ -1,0 +1,6 @@
+@CherryPickTool.Api_HostAddress = http://localhost:5089
+
+GET {{CherryPickTool.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

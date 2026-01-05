@@ -17,7 +17,14 @@
       "Bash(\"/c/Program Files/dotnet/dotnet.exe\" build CherryPickTool.sln -f net10.0-windows10.0.19041.0)",
       "Bash(\"/c/Program Files/dotnet/dotnet.exe\" run --project src/CherryPickTool.App -f net10.0-windows10.0.19041.0)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(\"/c/Program Files/dotnet/dotnet.exe\" new webapi -n CherryPickTool.Api -o src/CherryPickTool.Api -f net10.0 --no-openapi)",
+      "Bash(\"/c/Program Files/dotnet/dotnet.exe\" add src/CherryPickTool.Api/CherryPickTool.Api.csproj reference src/CherryPickTool.Core/CherryPickTool.Core.csproj)",
+      "Bash(\"/c/Program Files/nodejs/npm.cmd\" create vite@latest src/CherryPickTool.Web -- --template react-ts)",
+      "Bash(\"/c/Program Files/nodejs/npm.cmd\" install)",
+      "Bash(\"/c/Program Files/nodejs/npm.cmd\" install axios @tanstack/react-query)",
+      "Bash(\"/c/Program Files/nodejs/npm.cmd\" install -D tailwindcss @tailwindcss/vite)",
+      "Bash(\"/c/Program Files/dotnet/dotnet.exe\" build src/CherryPickTool.Api/CherryPickTool.Api.csproj)"
     ]
   }
 }

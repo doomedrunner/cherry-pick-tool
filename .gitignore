@@ -61,3 +61,9 @@ coverage*/
 
 # Publish output
 publish/
+
+# Node.js
+node_modules/
+dist/
+.npm
+*.tgz
