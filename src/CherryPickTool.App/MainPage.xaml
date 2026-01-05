@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CherryPickTool.App.ViewModels"
+             x:Class="CherryPickTool.App.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="Cherry-Pick Tool">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="15">
+
+        <!-- Settings Section -->
+        <ScrollView Grid.Row="0" HeightRequest="220">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Repository Settings" FontAttributes="Bold" FontSize="16"/>
+
+                <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                    <Label Text="Repo Path:" VerticalOptions="Center"/>
+                    <Entry Grid.Column="1" Text="{Binding RepoPath}" Placeholder="/path/to/repo"/>
+
+                    <Label Grid.Row="1" Text="GitHub Token:" VerticalOptions="Center"/>
+                    <Entry Grid.Row="1" Grid.Column="1" Text="{Binding GitHubToken}" IsPassword="True" Placeholder="ghp_xxxxx"/>
+
+                    <Label Grid.Row="2" Text="Owner:" VerticalOptions="Center"/>
+                    <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Owner}" Placeholder="username or org"/>
+
+                    <Label Grid.Row="3" Text="Repo Name:" VerticalOptions="Center"/>
+                    <Entry Grid.Row="3" Grid.Column="1" Text="{Binding RepoName}" Placeholder="repository-name"/>
+
+                    <Label Grid.Row="4" Text="Source Branch:" VerticalOptions="Center"/>
+                    <Entry Grid.Row="4" Grid.Column="1" Text="{Binding SourceBranch}"/>
+
+                    <Label Grid.Row="5" Text="Target Branch:" VerticalOptions="Center"/>
+                    <Entry Grid.Row="5" Grid.Column="1" Text="{Binding TargetBranch}"/>
+                </Grid>
+
+                <!-- Search Controls -->
+                <BoxView HeightRequest="1" Color="LightGray" Margin="0,10"/>
+                <Label Text="Search Commits" FontAttributes="Bold" FontSize="16"/>
+
+                <HorizontalStackLayout Spacing="10">
+                    <Picker x:Name="SearchModePicker" SelectedIndex="{Binding SelectedSearchMode}" WidthRequest="120">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>By Ticket</x:String>
+                                <x:String>By SHA</x:String>
+                                <x:String>By Date</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+                    <Entry Text="{Binding SearchQuery}" Placeholder="betty-1234 or SHA" WidthRequest="200"/>
+                    <Button Text="Search" Command="{Binding SearchCommitsCommand}"/>
+                    <Button Text="Load All New" Command="{Binding LoadCommitsCommand}"/>
+                </HorizontalStackLayout>
+
+                <HorizontalStackLayout Spacing="10" IsVisible="{Binding SelectedSearchMode, Converter={StaticResource IntToBoolConverter}}">
+                    <Label Text="From:" VerticalOptions="Center"/>
+                    <DatePicker Date="{Binding FromDate}"/>
+                    <Label Text="To:" VerticalOptions="Center"/>
+                    <DatePicker Date="{Binding ToDate}"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Commits List -->
+        <Border Grid.Row="1" Stroke="LightGray" StrokeThickness="1" Margin="0,10">
+            <Grid RowDefinitions="Auto,*">
+                <HorizontalStackLayout Spacing="10" Padding="5">
+                    <Label Text="Commits" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Button Text="Select All" Command="{Binding SelectAllCommand}" HeightRequest="30" Padding="10,0"/>
+                    <Button Text="Deselect All" Command="{Binding DeselectAllCommand}" HeightRequest="30" Padding="10,0"/>
+                </HorizontalStackLayout>
+
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Commits}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SelectableCommit">
+                            <Grid ColumnDefinitions="40,80,*,150,120" Padding="5" BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}">
+                                <CheckBox IsChecked="{Binding IsSelected}" VerticalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding ShortSha}" FontFamily="Consolas" VerticalOptions="Center" TextColor="DarkBlue"/>
+                                <Label Grid.Column="2" Text="{Binding Message}" LineBreakMode="TailTruncation" VerticalOptions="Center"/>
+                                <Label Grid.Column="3" Text="{Binding JiraTicket}" FontAttributes="Bold" TextColor="DarkGreen" VerticalOptions="Center"/>
+                                <Label Grid.Column="4" Text="{Binding Date}" FontSize="12" TextColor="Gray" VerticalOptions="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+        <!-- Actions Section -->
+        <VerticalStackLayout Grid.Row="2" Spacing="8">
+            <BoxView HeightRequest="1" Color="LightGray"/>
+
+            <Grid ColumnDefinitions="80,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                <Label Text="PR Title:" VerticalOptions="Center"/>
+                <Entry Grid.Column="1" Text="{Binding PrTitle}" Placeholder="Auto-generated if empty"/>
+
+                <Label Grid.Row="1" Text="Description:" VerticalOptions="Center"/>
+                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding PrDescription}" Placeholder="Optional description"/>
+            </Grid>
+
+            <HorizontalStackLayout Spacing="15">
+                <Button Text="Create Pull Request"
+                        Command="{Binding CreatePullRequestCommand}"
+                        BackgroundColor="DarkGreen"
+                        TextColor="White"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"/>
+
+                <Button Text="Open PR"
+                        Command="{Binding OpenPrCommand}"
+                        IsVisible="{Binding LastPrUrl, Converter={StaticResource StringToBoolConverter}}"/>
+
+                <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" HeightRequest="30" WidthRequest="30"/>
+            </HorizontalStackLayout>
+
+            <Label Text="{Binding StatusMessage}" FontSize="14" TextColor="DarkSlateGray"/>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
